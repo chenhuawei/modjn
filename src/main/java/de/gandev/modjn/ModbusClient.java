@@ -56,6 +56,7 @@ public class ModbusClient {
     private short unitIdentifier;
     private short protocolIdentifier;
     private CONNECTION_STATES connectionState = CONNECTION_STATES.notConnected;
+    private EventLoopGroup workerGroup;
 
     public ModbusClient(String host, int port) {
         this(host, port, DEFAULT_UNIT_IDENTIFIER, DEFAULT_PROTOCOL_IDENTIFIER);
@@ -78,7 +79,7 @@ public class ModbusClient {
 
     public void setup(ModbusResponseHandler handler) throws ConnectionException {
         try {
-            final EventLoopGroup workerGroup = new NioEventLoopGroup();
+            workerGroup = new NioEventLoopGroup();
 
             bootstrap = new Bootstrap();
             bootstrap.group(workerGroup);
@@ -117,9 +118,18 @@ public class ModbusClient {
     }
 
     public void close() {
-        if (channel != null) {
-            channel.close().awaitUninterruptibly();
+        try {
+            if (channel != null) {
+                channel.close().awaitUninterruptibly();
+            }
+
+            if (workerGroup != null) {
+                workerGroup.shutdownGracefully().sync();
+            }
+        } catch (Exception e) {
+            Logger.getLogger(ModbusClient.class.getName()).log(Level.SEVERE, e.getLocalizedMessage());
         }
+        setConnectionState(CONNECTION_STATES.notConnected);
     }
 
     private synchronized int calculateTransactionIdentifier() {
