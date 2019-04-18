@@ -19,22 +19,16 @@
 
     <repositories>
         <repository>
-            <id>shbluehour-public</id>
+            <id>nginx-shbluehour-public</id>
             <name>Blue Hour Repositories</name>
-            <url>http://nexus.chenxu.biz/repository/shbluehour-public/</url>
+            <url>http://mvn.chenxu.biz/shbluehour/</url>
         </repository>
     </repositories>
 
     <distributionManagement>
-        <snapshotRepository>
-            <id>shbluehour-snapshots</id>
-            <name>Blue Hour Snapshots</name>
-            <url>http://nexus.chenxu.biz/repository/shbluehour-snapshots/</url>
-        </snapshotRepository>
         <repository>
-            <id>shbluehour-releases</id>
-            <name>Blue Hour Releases</name>
-            <url>http://nexus.chenxu.biz/repository/shbluehour-releases/</url>
+            <id>nginx-repository-server-releases</id>
+            <url>scp://www.chenxu.biz/opt/mvn/repositories/shbluehour</url>
         </repository>
     </distributionManagement>
 
@@ -53,6 +47,13 @@
     </dependencies>
 
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.apache.maven.wagon</groupId>
+                <artifactId>wagon-ssh</artifactId>
+                <version>2.10</version>
+            </extension>
+        </extensions>
         <pluginManagement>
             <plugins>
                 <plugin>
